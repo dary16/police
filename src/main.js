@@ -5,9 +5,16 @@ import store from './store/index.js';
 import Vant from 'vant';
 import 'vant/lib/index.css';
 import components from './components';
+import * as util from './utils/common.js';
+import './styles/reset.css';
+import {
+    Dialog
+} from 'vant';
 
 Vue.use(Vant);
 Vue.config.productionTip = false;
+
+Vue.prototype.dialog = Dialog;
 
 // 自定义组件格式，全局可用
 Object.keys(components).forEach(key => {

@@ -6,7 +6,6 @@
       right-text="按钮"
       left-arrow
     />
-    <h1>{{ msg }}</h1>
   </div>
 </template>
 

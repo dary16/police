@@ -1,5 +1,9 @@
-import helloWorld from "./HelloWorld.vue";
+import vanFieldSelect from "./vanFieldSelect.vue";
+import header from "./header.vue";
+import title from "./title.vue";
 
 export default {
-    helloWorld
+    vanFieldSelect,
+    header,
+    title
 }
