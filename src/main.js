@@ -7,6 +7,7 @@ import 'vant/lib/index.css';
 import components from './components';
 import * as util from './utils/common.js';
 import './styles/reset.css';
+import './styles/common.css';
 import {
     Dialog
 } from 'vant';

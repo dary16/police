@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    class="van-cell"
+    style="padding:0"
+  >
     <van-field
       v-model="result"
       v-bind="$attrs"

@@ -32,6 +32,12 @@ export default new Router({
             name: 'list',
             component: () =>
                 import ('./views/list.vue')
+        },
+        {
+            path: '/map',
+            name: 'map',
+            component: () =>
+                import ('./views/map.vue')
         }
     ]
 })

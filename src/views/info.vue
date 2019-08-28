@@ -1,7 +1,6 @@
 <template>
   <div class="about">
     <v-header :title="title"></v-header>
-    <v-title :content="content"></v-title>
     <div class="content">
       <div class="img">
         <img src="../assets/testImg.jpg"/>
@@ -22,6 +21,7 @@
           <van-button
             color="#0ab5bd"
             size="small"
+            @click="toPoint"
           >导航至报警点</van-button>
           <van-button
             color="#e8433f"
@@ -37,27 +37,14 @@
   export default {
     data() {
       return {
-        title: '查看告警',
-        content: '图集'
+        title: '图集'
       }
     },
     mounted() {
-      //   this.initMap();
     },
     methods: {
-      initMap() {
-        // 百度地图API功能
-        var map = new BMap.Map("map");    // 创建Map实例
-        map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
-        //添加地图类型控件
-        map.addControl(new BMap.MapTypeControl({
-          mapTypes: [
-            BMAP_NORMAL_MAP,
-            BMAP_HYBRID_MAP
-          ]
-        }));
-        map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
-        map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+      toPoint() {
+        this.$router.push('/map');
       },
       commitFn() {
         this.$router.push('/list');
