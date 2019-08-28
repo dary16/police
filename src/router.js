@@ -13,31 +13,31 @@ export default new Router({
             path: '/login',
             name: 'login',
             component: () =>
-                import ('./views/login.vue')
+                import ('@/views/login.vue')
         },
         {
             path: '/info',
             name: 'info',
             component: () =>
-                import ('./views/info.vue')
+                import ('@/views/info.vue')
         },
         {
             path: '/main',
             name: 'main',
             component: () =>
-                import ('./views/main.vue')
+                import ('@/views/main.vue')
         },
         {
             path: '/list',
             name: 'list',
             component: () =>
-                import ('./views/list.vue')
+                import ('@/views/list.vue')
         },
         {
             path: '/map',
             name: 'map',
             component: () =>
-                import ('./views/map.vue')
+                import ('@/views/map.vue')
         }
     ]
 })

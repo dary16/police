@@ -3,41 +3,57 @@
     <v-header :title="title"></v-header>
     <div class="content">
       <div class="img">
-        <img src="../assets/testImg.jpg"/>
+        <img v-if="length === 1" src="../assets/testImg.jpg"/>
+        <van-swipe
+          :autoplay="3000"
+          indicator-color="black"
+        >
+          <van-swipe-item
+            v-for="(image, index) in images"
+            :key="index"
+          >
+            <img :src="image" />
+  </van-swipe-item>
+        </van-swipe>
+      </div>
+      <div class="address clearfix">
+        <div class="left fl">
+          <van-icon
+            size="50px"
+            name="location-o"
+          />
         </div>
-        <div class="address clearfix">
-          <div class="left fl">
-            <van-icon
-              size="50px"
-              name="location-o"
-            />
-          </div>
-          <div class="right fl">
-            <h3>告警地点</h3>
-            <h5>建国社区</h5>
-          </div>
-        </div>
-        <div class="btns">
-          <van-button
-            color="#0ab5bd"
-            size="small"
-            @click="toPoint"
-          >导航至报警点</van-button>
-          <van-button
-            color="#e8433f"
-            size="small"
-            @click="commitFn"
-          >结果反馈</van-button>
+        <div class="right fl">
+          <h3>告警地点</h3>
+          <h5>建国社区</h5>
         </div>
       </div>
+      <div class="btns">
+        <van-button
+          color="#0ab5bd"
+          size="small"
+          @click="toPoint"
+        >导航至报警点</van-button>
+        <van-button
+          color="#e8433f"
+          size="small"
+          @click="commitFn"
+        >结果反馈</van-button>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
   export default {
     data() {
       return {
-        title: '图集'
+        title: '图集',
+        length: 0,
+        images: [
+          'https://img.yzcdn.cn/vant/apple-1.jpg',
+          'https://img.yzcdn.cn/vant/apple-2.jpg'
+        ]
       }
     },
     mounted() {
