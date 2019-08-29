@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store/index.js';
 import Vant from 'vant';
+import axios from 'axios';
 import 'vant/lib/index.css';
 import components from './components';
 import * as util from './utils/common.js';
@@ -16,6 +17,7 @@ Vue.use(Vant);
 Vue.config.productionTip = false;
 
 Vue.prototype.dialog = Dialog;
+Vue.prototype.$http = axios;
 
 // 自定义组件格式，全局可用
 Object.keys(components).forEach(key => {

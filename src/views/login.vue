@@ -30,6 +30,7 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
   import {
     Dialog
   } from 'vant';
@@ -50,7 +51,7 @@
     watch: {},
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-
+      //   this.init();
     },
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
@@ -58,6 +59,17 @@
     },
     //方法集合
     methods: {
+      ...mapActions(['_getInfo']),
+      init() {
+        this._getInfo({
+          ops: { "userID": "xbb", "userPass": "111111" },
+          method: 'post',
+          api: 'getLogin',
+          callback: res => {
+            console.log(res);
+          }
+        })
+      },
       loginFn() {
         //登录建议 当用户名和密码都不为空时，登录按钮可点击
         this.$router.push('/main');

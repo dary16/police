@@ -1,9 +1,9 @@
 // 封装请求
 import api from './api';
 import axios from 'axios';
-// import {
-//     Popup
-// } from 'vant';
+import {
+    Toast
+} from 'vant';
 import store from '../store';
 
 // 全局设置
@@ -180,9 +180,9 @@ const xhr = ({
 
 function errHandler(er) {
     console.log(er);
-    // Toast({
-    //     message: '网络连接错误,请检查您的网络连接是否正常' + er
-    // });
+    Toast({
+        message: '网络连接错误,请检查您的网络连接是否正常' + er
+    });
 }
 
 export default xhr;
