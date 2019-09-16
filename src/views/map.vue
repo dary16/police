@@ -19,12 +19,16 @@
       class="mapAppList"
       v-if="isShowMapApp"
     >
-      <ul>
+      <ul v-if="hasMap">
         <li
           v-for="(i,index) in mapAppList"
           :key="index"
           @click="navFn(i.name)"
+          v-if="i.status"
         >{{i.title}}</li>
+      </ul>
+      <ul v-else>
+        <li @click="navFn(recommendMapApp.name)">{{recommendMapApp.title}}</li>
       </ul>
     </div>
     <van-overlay
@@ -49,32 +53,29 @@
         index: '0',
         isShowPointInfo: false,
         isShowMapApp: false,
+        hasMap: true,//本地是否安装地图APP
         list: [{
           lon: 108.95217,
           lat: 34.262726,
           name: "预置位1"
-        }, {
-          lon: 108.952295,
-          lat: 34.261495,
-          name: "预置位2"
-        }, {
-          lon: 108.952753,
-          lat: 34.260302,
-          name: "预置位3"
         }],
         mapAppList: [{
-          name: 'baidumap',
+          name: 'com.baidu.BaiduMap',
           title: "百度地图",
           status: false
         }, {
-          name: 'amap',
+          name: 'com.autonavi.minimap',
           title: "高德地图",
           status: false
         }, {
-          name: 'qqmap',
+          name: 'com.tencent.map',
           title: "腾讯地图",
           status: false
-        }]
+        }],
+        recommendMapApp: {
+          name: 'com.tencent.map',
+          title: "腾讯地图（推荐安装）"
+        }
       };
     },
     props: [],
@@ -86,7 +87,10 @@
     },
     //生命周期 - 创建完成（可以访问当前this实例）
     created() {
-      //this.getQQMap();
+      //console.log(this.$route.params.mapData);
+      this.list[0].lat = this.$route.params.mapData.latitude;
+      this.list[0].lon = this.$route.params.mapData.longitude;
+      this.list[0].name = this.$route.params.mapData.warningAddress;
     },
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {
@@ -99,7 +103,7 @@
       init() {
         //步骤：定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
         //设置地图中心点
-        var myLatlng = new qq.maps.LatLng(34.260302, 108.952295);
+        var myLatlng = new qq.maps.LatLng(this.list[0].lat, this.list[0].lon);
         //定义工厂模式函数
         var myOptions = {
           zoom: 16,               //设置地图缩放级别
@@ -128,9 +132,28 @@
       },
       showMapAppList() {
         this.isShowMapApp = true;
+        var num = 0;
+        for (var i = 0; i < this.mapAppList.length; i++) {
+          try {
+            var packageName = this.mapAppList[i].name;//'com.baidu.BaiduMap'地图的包名
+            var main = plus.android.runtimeMainActivity();
+            var packageManager = main.getPackageManager();
+            var PackageManager = plus.android.importClass(packageManager);
+            var packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+            if (packageInfo) {
+              this.mapAppList[i].status = true;
+              num++;
+            } else {
+            }
+          } catch (e) {
+          }
+        }
+        if (num == 0) {
+          this.hasMap = false;
+        }
       },
       navFn(name) {
-        openMapApp(this.list[this.index].lat, this.list[this.index].lon, "");
+        openMapApp(this.list[this.index].lat, this.list[this.index].lon, "", name);
         this.isShowMapApp = false;
       }
     },
@@ -164,7 +187,7 @@
       ul {
         li {
           text-align: left;
-          line-height: 0.6rem;
+          line-height: 0.8rem;
           margin: 0 0.1rem;
           padding: 0 0.1rem;
           border-bottom: 1px solid #e2e2e2;
@@ -193,17 +216,17 @@
     right: 0;
     bottom: 0;
     left: 0;
-    height: 0.5rem;
+    height: 0.8rem;
     background-color: #fff;
     border-top: 1px solid #eee;
-    line-height: 0.5rem;
+    line-height: 0.8rem;
     text-align: left;
     padding-left: 0.2rem;
     .van-button {
       float: right;
       margin: 0.06rem;
-      height: 0.38rem;
-      line-height: 0.36rem;
+      height: 0.58rem;
+      line-height: 0.56rem;
       border-radius: 4px;
     }
   }

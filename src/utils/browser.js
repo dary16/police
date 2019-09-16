@@ -53,10 +53,10 @@ var browser = {
 var ua = browser.ua;
 
 // 打开地图App，开始导航
-export function openMapApp(lat, lng, addr) {
+/*export function openMapApp(lat, lng, addr, maps) {
     // 地图uri api数组
     var uri = new Array();
-    console.log(ua.android);
+    console.log(maps);
     if (ua.android) {
         // 百度地图uri api
         uri[0] = "baidumap://map/navi?location=" + lat + "," + lng + "&query=" +
@@ -121,4 +121,45 @@ export function openMapApp(lat, lng, addr) {
             clearTimeout(time2);
         }
     }
+}*/
+export function openMapApp(lat, lng, addr, maps) {
+    // 地图uri api数组
+    var uri = "";
+    if (ua.android) {
+        if (maps == "com.baidu.BaiduMap") {
+            // 百度地图uri api
+            uri = "baidumap://map/navi?location=" + lat + "," + lng + "&query=" + addr;
+        } else if (maps == "com.autonavi.minimap") {
+            // 高德地图uri api
+            uri = "androidamap://navi?sourceApplication=xlwx&poiname=" + addr +
+                "&lat=" + lat + "&lon=" + lng + "&dev=1&style=2";
+        } else if (maps == "com.tencent.map") {
+            // 腾讯地图uri api
+            uri = "qqmap://map/marker?marker=coord:" + lat + "," + lng +
+                ";title:" + addr + "&referer=xlwx";
+        }
+    } else if (ua.iOS) {
+        if (maps == "com.baidu.BaiduMap") {
+            // 百度地图uri api
+            uri = "baidumap://map/navi?location=" + lat + "," + lng + "&query=" +
+                addr;
+        } else if (maps == "com.autonavi.minimap") {
+            // 高德地图uri api
+            uri = "iosamap://navi?sourceApplication=xlwx&poiname=" + addr +
+                "&lat=" + lat + "&lon=" + lng + "&dev=1&style=2";
+        } else if (maps == "com.tencent.map") {
+            // 腾讯地图uri api
+            uri = "qqmap://map/marker?marker=coord:" + lat + "," + lng +
+                ";title:" + addr + "&referer=xlwx";
+        }
+        /*else if () {
+                   //苹果地图uri api
+                   uri = "http://maps.apple.com/?sll=" + lat + "," + lng + "&address=" +
+                       addr;
+               }*/
+    }
+    if (uri == "") {
+        return
+    }
+    window.location.href = uri;
 }

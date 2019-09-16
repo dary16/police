@@ -8,17 +8,18 @@ import store from '../store';
 
 // 全局设置
 axios.defaults.headers.common['Authorization'] = 'demo';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.post['Content-Type'] = 'text/xml;charset=UTF-8';
 
 // 拦截request,设置全局请求为ajax请求
 axios.interceptors.request.use(config => {
-    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    // config.headers['X-Requested-With'] = 'XMLHttpRequest';
     return config;
 });
 
 // 拦截响应response，并做一些错误处理
 axios.interceptors.response.use(
     response => {
+        console.log('response');
         const data = response.data;
 
         return data;
@@ -89,7 +90,7 @@ const htp = axios.create({
 const xhr = ({
     method = 'post',
     ur,
-    options = {}
+    options
 }) => {
     let p,
         m = false;
@@ -105,24 +106,18 @@ const xhr = ({
     //       }));
     //   }, 500);
 
-    let ops = {};
+    let ops = '';
     let unOps = {};
+
 
     if (store.state.userInfo) {
         unOps = JSON.parse(JSON.stringify(store.state.userInfo));
         if (method == 'get') {
-            ops = {
-                userId: unOps.accountId,
-                token: unOps.token,
-                timeStamp: new Date().getTime()
-            };
+            ops = getPostData();
         } else {
-            ops = {
-                userId: unOps.accountId,
-                token: unOps.token
-            };
+            ops = options;
         }
-        Object.assign(ops, options);
+        // Object.assign(ops, options);
     } else {
         ops = options;
     }
@@ -130,16 +125,13 @@ const xhr = ({
         case 'get':
             p = new Promise(function(resolve, reject) {
                 htp
-                    .get(api[ur], {
-                        params: ops
-                    })
+                    .get(api[ur], ops)
                     .then(
                         response => {
-                            // console.log(response.data.code, 'data');
                             m = true;
                             load.close();
-                            if (response.data.code && response.data.code == 1) {
-                                resolve(response.data.body);
+                            if (response.data && response.status == 200) {
+                                resolve(response.data);
                             } else {
                                 reject(response.data.msg);
                             }
@@ -158,8 +150,8 @@ const xhr = ({
                     response => {
                         m = true;
                         load.close();
-                        if (response.data.code && response.data.code == 1) {
-                            resolve(response.data.body);
+                        if (response.data && response.status == 200) {
+                            resolve(response.data);
                         } else {
                             reject(response.data.msg);
                         }
@@ -179,7 +171,6 @@ const xhr = ({
 };
 
 function errHandler(er) {
-    console.log(er);
     Toast({
         message: '网络连接错误,请检查您的网络连接是否正常' + er
     });

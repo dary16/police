@@ -1,3 +1,16 @@
 .van-field__label--left {
     text-align: left !important;
 }
+
+.van-field__control {
+    margin-top: .06rem !important;
+}
+
+.van-icon-delete {
+    font-size: .3rem !important;
+}
+
+.van-image__img {
+    width: auto !important;
+    height: 5rem !important;
+}

@@ -7,17 +7,24 @@ import axios from 'axios';
 import 'vant/lib/index.css';
 import components from './components';
 import * as util from './utils/common.js';
+// import './utils/websocket';
 import './styles/reset.css';
 import './styles/common.css';
 import {
     Dialog
 } from 'vant';
+import VueLazyLoad from 'vue-lazyload';
+import Mui from 'vue-awesome-mui';
 
 Vue.use(Vant);
+Vue.use(VueLazyLoad);
+Vue.use(Mui);
 Vue.config.productionTip = false;
 
+Vue.prototype.util = util;
 Vue.prototype.dialog = Dialog;
 Vue.prototype.$http = axios;
+Vue.prototype.mui = Mui;
 
 // 自定义组件格式，全局可用
 Object.keys(components).forEach(key => {

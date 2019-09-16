@@ -1,257 +1,283 @@
 <template>
-  <div class='list'>
-    <v-header :title="title"></v-header>
-    <div class="cell-wrap">
-      <van-cell-group>
-        <van-field
-          v-model="objData.address"
-          clearable
-          label="项目位置:"
-          placeholder="（必填）项目位置"
-        />
+  <div class='main'>
+    <v-header
+      :title="title"
+      :isShow="isShow"
+    ></v-header>
+    <van-tabs
+      v-model="active"
+      swipeable
+      background="#f0f0f0"
+      @click="tabFn"
+    >
+      <van-tab title="未完成">
+        <v-list-item
+          v-if="showUnfinished"
+          :items="unfinished"
+          :infoFn="infoFn"
+          v-on:infoIdFn="infoIdFn"
+        ></v-list-item>
+        <div
+          v-else
+          class="nodata"
+        >暂无数据</div>
+      </van-tab>
+      <van-tab title="已完成">
+        <v-list-item
+          v-if="showFinished"
+          :items="finished"
+          v-on:infoIdFn="infoFnFinished"
+        ></v-list-item>
+        <div
+          v-else
+          class="nodata"
+        >暂无数据</div>
+      </van-tab>
+    </van-tabs>
 
-        <van-field
-          v-model="objData.number"
-          type="number"
-          label="项目编号:"
-          placeholder="（必填）项目编号"
-        />
-
-        <van-field
-          v-model="objData.name"
-          clearable
-          label="项目名称:"
-          placeholder="（必填）项目名称"
-        />
-
-        <v-van-field-select
-          v-model="objData.unit"
-          label="用地单位:"
-          placeholder="（必填）请选择"
-          :columns="['行政处罚','刑事处罚','行政处分']"
-        />
-
-        <van-field
-          v-model="objData.area"
-          clearable
-          label="占地面积(㎡):"
-          placeholder="（必填）占地面积"
-        />
-
-        <van-field
-          v-model="objData.time"
-          label="开工时间:"
-          placeholder="（必填）选择时间"
-          readonly
-          @click="chooseTime = true"
-        />
-        <van-popup
-          v-model="chooseTime"
-          label="开工时间"
-          position="bottom"
-          :overlay="true"
-        >
-          <van-datetime-picker
-            v-model="currentTime"
-            type="datetime"
-            :max-date="currentTime"
-            :formatter="formatter"
-            @cancel="chooseTime = false"
-            @confirm="confirmFn"
-            @change="timeChange"
-          />
-        </van-popup>
-
-        <van-field
-          v-model="objData.structure"
-          clearable
-          label="建筑结构:"
-          placeholder="（必填）建筑结构"
-        />
-
-        <van-field
-          v-model="objData.progress"
-          clearable
-          label="建筑进度:"
-          placeholder="（必填）建筑进度"
-        />
-
-        <v-van-field-select
-          v-model="objData.breakRule"
-          label="违法性质:"
-          placeholder="（必填）请选择"
-          :columns="['未报即用','边报边用']"
-        />
-
-        <v-van-field-select
-          v-model="objData.methods"
-          label="已采取措施:"
-          placeholder="（必填）请选择"
-          :columns="['事业单位','个人']"
-        />
-
-        <van-field
-          v-model="objData.infoContent"
-          id="textarea"
-          label="是否符合土地利用总体规划:"
-          type="textarea"
-          placeholder="请填写具体内容"
-          rows="1"
-          label-width="100%"
-          label-align="left"
-          autosize
-        />
-
-      </van-cell-group>
-
-      <div class="loader-wrap">
-        <h3>现场照片</h3>
-        <van-uploader
-          v-model="fileList"
-          multiple
-          :after-read="afterRead"
-        />
-      </div>
-      <div class="footer-btn">
-        <van-button
-          color="#0ab5bd"
-          size="small"
-          @click="commitFn"
-        >提交</van-button>
-        <van-button
-          color="#e8433f"
-          size="small"
-          @click="cancelFn"
-        >关闭</van-button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-  import { formatDate } from '../utils/common.js';
+  import { getPostData, getParams, getLoc, setLoc } from "../utils/common.js";
+  import { mapActions, mapMutations, mapState } from "vuex";
   export default {
     data() {
       //这里存放数据
       return {
-        title: '派警回执（处理中）',
-        objData: {
-          address: '',
-          number: '',
-          name: '',
-          unit: '',
-          area: '',
-          time: '',
-          structure: '',
-          progress: '',
-          breakRule: '',
-          methods: '',
-          infoContent: '',
-          url: ''
-        },
-        chooseTime: false,
-        currentDate_end: '',
-        currentTime: new Date(),
-        fileList: [
-          { url: 'https://img.yzcdn.cn/vant/cat.jpeg' }
-          // Uploader 根据文件后缀来判断是否为图片文件
-          // 如果图片 URL 中不包含类型信息，可以添加 isImage 标记来声明
-        ]
+        title: "派警列表",
+        unfinished: [
+          {
+            address: "西青区天津西琉城",
+            dispatchId: "e3df1084-79f0-484d-ad32-80aa7a59dcfd",
+            id: "07752d8d-e49e-4e69-939a-f606e3e7b41a",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "2",
+            stakeNO: "34",
+            time: "2019-04-29 00:09:34",
+            title: "监控预警提醒",
+          }, {
+            address: "西青区天津西琉城",
+            dispatchId: "b74062f4-0cc7-445e-b402-9fd7b39cb854",
+            id: "0cc5386a-488b-4730-b817-ceb2a8effb09",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "2",
+            stakeNO: "34",
+            time: "2019-04-21 00:09:34",
+            title: "监控预警提醒",
+          }, {
+            address: "西青区天津西琉城",
+            dispatchId: "1e29fb08-9f41-4bd9-b0f5-b57503ad0f1e",
+            id: "0fb238cf-8a56-4aa1-b8b4-b841d8e2b596",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "2",
+            stakeNO: "34",
+            time: "2019-04-25 00:09:34",
+            title: "监控预警提醒",
+          }, {
+            address: "西青区天津西琉城",
+            dispatchId: "30517215-0397-484f-8526-ae4e268456fa",
+            id: "b110eaf5-f648-4f11-b6d2-d49806fed5eb",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "2",
+            stakeNO: "34",
+            time: "2019-04-18 00:09:34",
+            title: "监控预警提醒",
+          }],
+        finished: [
+          {
+            address: "滨海新区新区101号",
+            dispatchId: "4db11b02-dc5c-413b-84e2-a559e6d16014",
+            id: "bd8cd32c9b3c46fe9870e91555799554",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "282",
+            stakeNO: "12",
+            time: "2019-05-24 14:48:00",
+            title: "监控预警提醒",
+          },
+          {
+            address: "西青区天津西琉城",
+            dispatchId: "2e28d36c-a07f-48ea-bba5-9e9a8da50684",
+            id: "b110eaf5-f648-4f11-b6d2-d49806fed",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "2",
+            stakeNO: "34",
+            time: "2019-08-09 00:09:34",
+            title: "监控预警提醒",
+          },
+          {
+            address: "碑林区钟楼",
+            dispatchId: "52ae7c10-0864-4b09-b211-e91cd625a87e",
+            id: "2496a5a4-7c82-486e-99ca-ae17c86cc60f",
+            info: "发现",
+            infoTitle: "",
+            presetNo: "2",
+            stakeNO: "34",
+            time: "2019-07-22 18:39:45",
+            title: "监控预警提醒",
+          }
+        ],
+        showUnfinished: false,
+        showFinished: false,
+        id: '',
+        infoId: '',
+        isShow: "hide",
+        active: 0
       };
     },
     props: [],
     //监听属性 类似于data概念
-    computed: {},
+    computed: {
+      ...mapState(['activeIndex'])
+    },
     //监控data中的数据变化
     watch: {},
-    //生命周期 - 创建完成（可以访问当前this实例）
+    //生命周期 - 创建完成（可以访问当前this实例） 
     created() {
-
+      this.active = this.activeIndex;
+      //初始化数据
+      //   this.initUnfinishedData();
+      //   this.initFinishedData();
     },
     //生命周期 - 挂载完成（可以访问DOM元素）
-    mounted() {
-
-    },
+    mounted() { },
     //方法集合
     methods: {
-      confirmFn(e) {
-        let time = formatDate(e.getTime(), 3);
-        console.log(time);
-        this.objData.time = time;
-        this.chooseTime = false;
+      ...mapMutations(['_userInfo', '_warnId', '_disptId', '_activeIndex']),
+      ...mapActions(['_getInfo']),
+      infoFn() {
+        this.$router.push('/unfinishedDetails');
       },
-      timeChange(e) {
-        let timeArr = e.getValues();
-        this.objData.time = `${timeArr[0]}-${timeArr[1]}-${timeArr[2]} ${timeArr[3]}:${timeArr[4]}`;
-        console.log(this.objData.time);
+      infoIdFn(val) {
+        let warnId = val.id;
+        let dispId = val.dispatchId;
+        this._warnId(val.id);
+        this._disptId(val.dispatchId);
+        this.$router.push('/unfinishedDetails');
       },
-      //文字进行格式化处理
-      formatter(type, value) {
-        if(type === "year") {
-          return `${value}年`
-        } else if(type === "month") {
-          return `${value}月`
-        } else if(type === "day") {
-          return `${value}日`
-        } else if(type === "hour") {
-          return `${value}时`
-        } else if(type === "minute") {
-          return `${value}分`
-        }
-        return value;
+      //详情
+      infoFnFinished(val) {
+        this.infoId = val.dispatchId;
+        this.$router.push({ name: 'finishedDetails', params: { dispatchId: this.infoId } });
       },
-      //提交
-      commitFn() {
-        console.log(this.objData);
+      //未完成
+      initUnfinishedData() {
+        //提交数据
+        const params = getPostData("findDispatchPolice", [
+          getLoc('userInfo').userID,
+          '已派警'
+        ]);
+
+        this._getInfo({
+          ops: params,
+          method: "post",
+          api: "dispatchPolice",
+          callback: res => {
+            var div = document.createElement("div");
+            div.innerHTML = res;
+            var listInfoData = div.querySelector("return").innerHTML;
+            if(listInfoData != "[]") {
+              listInfoData = JSON.parse(listInfoData);
+              this.showUnfinished = true;
+              this.unfinished = [];
+              for(var i = 0; i < listInfoData.length; i++) {
+                var newdata = {
+                  id: listInfoData[i].warningID,
+                  dispatchId: listInfoData[i].dispatchPoliceID,
+                  title: "监控预警提醒",
+                  time: listInfoData[i].warningTime,
+                  info: "发现" + listInfoData[i].warningStatusLabel,
+                  infoTitle: listInfoData[i].warningStatusLabel,
+                  stakeNO: listInfoData[i].stakeNO,
+                  presetNo: listInfoData[i].presetno,
+                  address: listInfoData[i].warningAddress
+                }
+                this.unfinished.push(newdata);
+              }
+            } else {
+              this.showUnfinished = false;
+            }
+          }
+        });
       },
-      //关闭
-      cancelFn() {
-        this.$router.back(-1);
+      //已完成
+      initFinishedData() {
+        //提交数据
+        const params = getPostData("findDispatchPolice", [
+          getLoc('userInfo').userID,
+          '已回执'
+        ]);
+
+        this._getInfo({
+          ops: params,
+          method: "post",
+          api: "dispatchPolice",
+          callback: res => {
+            var div = document.createElement("div");
+            div.innerHTML = res;
+            var listInfoData = div.querySelector("return").innerHTML;
+            if(listInfoData != "[]") {
+              listInfoData = JSON.parse(listInfoData);
+              this.showFinished = true;
+              this.finished = [];
+              for(var i = 0; i < listInfoData.length; i++) {
+                var newdata = {
+                  id: listInfoData[i].warningID,
+                  dispatchId: listInfoData[i].dispatchPoliceID,
+                  title: "监控预警提醒",
+                  time: listInfoData[i].warningTime,
+                  info: "发现" + listInfoData[i].warningStatusLabel,
+                  infoTitle: listInfoData[i].warningStatusLabel,
+                  stakeNO: listInfoData[i].stakeNO,
+                  presetNo: listInfoData[i].presetno,
+                  address: listInfoData[i].warningAddress
+                }
+                this.finished.push(newdata);
+              }
+            } else {
+              this.showFinished = true;
+            }
+          }
+        });
       },
-      afterRead(file) {
-        console.log(file);
+      tabFn(val) {
+        this.active = val;
+        this._activeIndex(val);
       }
     },
-    updated() { }, //生命周期 - 更新之后
-    activated() { }, //如果页面有keep-alive缓存功能，这个函数会触发
+    updated() {
+      this.active = this.activeIndex;
+    },
   }
 </script>
 <style lang='less' scoped>
-  .list {
-    .cell-wrap {
-      position: fixed;
+  .main {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    .van-tabs {
+      position: absolute;
       top: 46px;
-      left: 0;
-      bottom: 0;
       right: 0;
-      overflow-y: auto;
-      .van-cell-group {
-        .van-cell {
-          &:last-child {
-            display: block !important;
-            &.van-cell__value {
-              textarea {
-                width: 100% !important;
-              }
-            }
-          }
-        }
-      }
-      .loader-wrap {
-        padding: 0.1rem 0.36rem;
-        text-align: left;
-        h3 {
-          color: #323233;
-          font-size: 14px;
-          height: 0.6rem;
-          line-height: 0.6rem;
-        }
-      }
-      .footer-btn {
-        padding: 0.3rem 0.36rem;
-        button {
-          margin-right: 0.2rem;
-        }
+      bottom: 0;
+      left: 0;
+      background-color: #f0f0f0;
+      .nodata {
+        position: absolute;
+        bottom: 1rem;
+        text-align: center;
+        color: #999;
+        left: 50%;
+        width: 1rem;
+        margin-left: -0.5rem;
       }
     }
   }

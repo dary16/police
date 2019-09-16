@@ -1,7 +1,7 @@
-import {
-    toast
-} from 'vant';
 import htp from '../../http';
+import {
+    Dialog
+} from 'vant';
 
 export default {
     //接口请求到的值，直接返回
@@ -9,18 +9,18 @@ export default {
         commit
     }, data) {
         const method = data.method ? data.method : 'post';
-
         htp({
             ur: data.api,
             options: data.ops,
             method: method
         }).then(
+
             res => {
                 typeof data.callback == 'function' && data.callback(res);
             },
             er => {
-                Toast({
-                    type: "fail",
+                Dialog.confirm({
+                    title: data.title || '提示',
                     message: er
                 });
             }

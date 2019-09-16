@@ -1,5 +1,6 @@
 const path = require('path');
 const UglifyPlugin = require('uglifyjs-webpack-plugin');
+// const post2rem = require('post2rem');
 
 module.exports = {
     publicPath: './', //基本路径
@@ -63,23 +64,31 @@ module.exports = {
         sourceMap: false, //开启 css source map
         loaderOptions: {
             css: {}, //这里的选项会传递给 css-loader
-            postcss: {} //这里的选项会传递给 postcss-loader
+            postcss: {
+                plugins: [
+                    require('postcss-px2rem')({
+                        remUnit: 37.5
+                    })
+                ]
+            } //这里的选项会传递给 postcss-loader
         },
         modules: false //启用css modules for all css
     },
     parallel: require('os').cpus().length > 1, //是否为 Babel或 TypeScript使用thread-loader
     pwa: {}, //PWA 插件相关配置 see https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa
 
+    // 'autoprefixer': {
+    //     browsers: ['Android >= 4.0', 'IOS >= 7']
+    // },
     //webpack-dev-server相关配置
     devServer: {
-        host: '0.0.0.0', //允许外部ip访问
         port: 80, //端口
         proxy: {
-            './api': {
-                target: 'http://192.168.200.199',
+            '/webservice': {
+                target: 'http://192.168.200.125/webservice',
                 changeOrigin: true, //允许websockets跨域
                 pathRewrite: {
-                    '^/proxy': ''
+                    '^/webservice': ''
                 }
             }
         }
